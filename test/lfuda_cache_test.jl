@@ -137,3 +137,22 @@ end
     @test get!(() -> default_value, lfuda, :key_5) == default_value
   end
 end
+
+@testset "Testing deletion" begin
+  lfuda = LFUDA{Symbol, Int32}(maxsize = 10)
+
+  value = Int32(10)
+  default_value = Int32(5)
+
+  lfuda[:key] = value
+  node_index, cache_item = lfuda.cache[:key]
+
+  init_size = lfuda.current_size
+  init_heap_size = length(lfuda.heap)
+
+  delete!(lfuda, :key)
+
+  @test lfuda.current_size == init_size - 1
+  @test !haskey(lfuda, :key)
+  @test length(lfuda.heap) == init_heap_size - 1
+end

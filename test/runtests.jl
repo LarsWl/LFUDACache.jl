@@ -1,3 +1,4 @@
+using LFUDACache
 using Test
 using Dates
 
@@ -8,6 +9,7 @@ end
 tests = [
     "./cache_item_test.jl",
     "./lfuda_cache_test.jl",
+    "./benchmark.jl"
 ]
 
 @info log("Running tests....")
