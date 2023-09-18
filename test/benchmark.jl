@@ -1,5 +1,6 @@
 using LFUDACache
 using BenchmarkTools
+using LRUCache
 
 keys = map(i -> Symbol("key_$i"), 1:1000)
 values = map(i -> rand(50) |> string, 1:1000)
@@ -30,6 +31,10 @@ write_operation(lfuda) =
   end
 
 lfuda = LFUDA{Symbol, String}(maxsize = 750)
+lru = LRU{Symbol, String}(maxsize = 750)
 
 @benchmark write_operation(lfuda) samples = 5000 evals = 5
 @benchmark read_operation(lfuda) samples = 5000 evals = 5
+
+@benchmark write_operation(lru) samples = 5000 evals = 5
+@benchmark read_operation(lru) samples = 5000 evals = 5
