@@ -5,36 +5,40 @@ using LRUCache
 keys = map(i -> Symbol("key_$i"), 1:1000)
 values = map(i -> rand(50) |> string, 1:1000)
 
-global key_index = 1
+mutable struct KeyIndex
+  value::Int
+end
 
-increment_key() = 
+increment_key(key_index) = 
   begin
-    if key_index == length(keys)
-      global key_index = 1
+    if key_index.value == length(keys)
+      key_index.value = 1
     else
-      global key_index += 1
+      key_index.value += 1
     end
   end
 
-read_operation(lfuda) =
+read_operation(lfuda, key_index) =
   begin
-    get(lfuda, keys[key_index], nothing)
+    get(lfuda, keys[key_index.value], nothing)
 
-    increment_key()
+    increment_key(key_index)
   end
 
-write_operation(lfuda) =
+write_operation(lfuda, key_index) =
   begin
-    lfuda[keys[key_index]] = values[key_index]
+    lfuda[keys[key_index.value]] = values[key_index.value]
 
-    increment_key()
+    increment_key(key_index)
   end
 
 lfuda = LFUDA{Symbol, String}(maxsize = 750)
 lru = LRU{Symbol, String}(maxsize = 750)
 
-@benchmark write_operation(lfuda) samples = 5000 evals = 5
-@benchmark read_operation(lfuda) samples = 5000 evals = 5
+key_index = KeyIndex(1)
+@benchmark write_operation(lfuda, key_index) samples = 5000 evals = 5
+@benchmark read_operation(lfuda, key_index) samples = 5000 evals = 5
 
-@benchmark write_operation(lru) samples = 5000 evals = 5
-@benchmark read_operation(lru) samples = 5000 evals = 5
+key_index = KeyIndex(1)
+@benchmark write_operation(lru, key_index) samples = 5000 evals = 5
+@benchmark read_operation(lru, key_index) samples = 5000 evals = 5

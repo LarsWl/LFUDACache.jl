@@ -120,17 +120,16 @@ function Base.setindex!(lfuda::LFUDA{K, V}, value::V, key::K)::V where {K,V}
   lock(lfuda.lock) do
     cache_tuple = get(lfuda.cache, key, nothing)
 
-    if isnothing(cache_tuple)
-      cache_item = insert_cache_item!(lfuda, key, value)
+    cache_item =
+      if isnothing(cache_tuple)
+        insert_cache_item!(lfuda, key, value)
+      else
+        node_index, = cache_tuple
 
-      return cache_item.data
-    else
-      node_index, = cache_tuple
+        replace_cache_item!(lfuda, node_index, key, value)
+      end
 
-      cache_item = replace_cache_item!(lfuda, node_index, key, value)
-
-      return cache_item.data
-    end
+    return cache_item.data
   end
 end
 
@@ -172,10 +171,9 @@ end
 function insert_cache_item!(lfuda::LFUDA{K, V}, key::K, value::V)::CacheItem{V} where {K, V}
   should_evict(lfuda) && evict!(lfuda)
 
-  length(lfuda.current_size) 
   cache_item = CacheItem{V}(value)
 
-  cache_item.frequency += 1
+  cache_item.frequency = 1
   cache_item.priority_key = lfuda.priority_key_policy(cache_item, lfuda.age)
 
   node_index = push!(lfuda.heap, CacheHeapNode(key, cache_item))

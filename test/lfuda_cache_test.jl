@@ -28,7 +28,7 @@ end
       node_index, cache_item = lfuda.cache[key]
 
       @test cache_item.frequency == 1
-      @test cache_item.priority_key == lfuda.priority_key_policy(cache_item, lfuda.age)
+      @test cache_item.priority_key === lfuda.priority_key_policy(cache_item, lfuda.age)
       @test cache_item.data == value
 
       cache_heap_node, handle = top_with_handle(lfuda.heap)
@@ -50,7 +50,7 @@ end
       node_index, cache_item = lfuda.cache[key]
 
       @test cache_item.frequency == 1
-      @test cache_item.priority_key == lfuda.priority_key_policy(cache_item, lfuda.age)
+      @test cache_item.priority_key === lfuda.priority_key_policy(cache_item, lfuda.age)
       @test cache_item.data == new_value
     end
   end
@@ -68,7 +68,7 @@ end
     node_index, cache_item = lfuda.cache[key]
 
     @test cache_item.frequency == 1
-    @test cache_item.priority_key == lfuda.priority_key_policy(cache_item, lfuda.age)
+    @test cache_item.priority_key === lfuda.priority_key_policy(cache_item, lfuda.age)
     @test cache_item.data == value
   end
 
