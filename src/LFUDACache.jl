@@ -184,9 +184,8 @@ function insert_cache_item!(lfuda::LFUDA{K, V}, key::K, value::V)::CacheItem{V} 
 end
 
 function evict!(lfuda::LFUDA)
-  cache_heap_node, = top_with_handle(lfuda.heap)
-  pop!(lfuda.heap)
-
+  cache_heap_node = pop!(lfuda.heap)
+  
   lfuda.age = cache_heap_node.cache_item.priority_key
   lfuda.current_size -= 1
 

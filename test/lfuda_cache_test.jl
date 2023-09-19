@@ -76,6 +76,7 @@ end
     lfuda = LFUDA{Symbol, Int}(maxsize = 3)
 
     lfuda[:key_1] = 1
+    # Access element to increase its frequency
     lfuda[:key_1]
 
     lfuda[:key_2] = 2
