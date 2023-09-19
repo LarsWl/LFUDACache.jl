@@ -193,7 +193,7 @@ function evict!(lfuda::LFUDA)
 end
 
 function should_evict(lfuda::LFUDA)::Bool
-  lfuda.current_size == lfuda.maxsize
+  lfuda.current_size == lfuda.maxsize && lfuda.current_size > 0
 end
 
 end
