@@ -5,7 +5,6 @@ export LFUDA
 using DataStructures
 
 include("cache_item.jl")
-
 mutable struct LFUDA{K,V} <: AbstractDict{K,V}
   cache::Dict{K, Tuple{Integer, CacheItem{V}}} # Integer is a node index in heap
   heap::MutableBinaryMinHeap{CacheHeapNode{K,V}}
@@ -175,6 +174,8 @@ function insert_cache_item!(lfuda::LFUDA{K, V}, key::K, value::V)::CacheItem{V} 
 
   cache_item.frequency = 1
   cache_item.priority_key = lfuda.priority_key_policy(cache_item, lfuda.age)
+
+  lfuda.maxsize == 0 && return cache_item;
 
   node_index = push!(lfuda.heap, CacheHeapNode(key, cache_item))
   lfuda.cache[key] = (node_index, cache_item)

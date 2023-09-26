@@ -10,7 +10,6 @@ using Test
   @test item.data == value
   @test item.priority_key == 0
   @test item.frequency == 0
-  @test item.size == sizeof(value)
 end
 
 @testset "Testing CacheItem order" begin
@@ -32,5 +31,4 @@ end
 
   @test LFUDACache.lfu_priority_key_policy(cache_item, age) == 10.0
   @test LFUDACache.lfuda_priority_key_policy(cache_item, age) == 12.5
-  @test LFUDACache.gdsf_priority_key_policy(cache_item, age) == 5.0
 end

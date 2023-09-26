@@ -3,7 +3,6 @@
 Thread-safe in memory implementation of Least Frequency Used cache based on min binary heap map. Package provides three policies for calculation of priority key (more information [here](https://www.hpl.hp.com/techreports/98/HPL-98-173.pdf))
 1) LFU policy
 2) LFU with Dynamic Age policy (by default)
-3) GreedyDual-Size with Frequency (GDSF)
 
 ## Usage
 
