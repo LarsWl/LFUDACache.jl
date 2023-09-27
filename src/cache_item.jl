@@ -1,12 +1,14 @@
 mutable struct CacheItem{V}
   priority_key::Float64
   frequency::Int
+  size::Integer
   data::V
 
-  function CacheItem{V}(data::V) where {V}
+  function CacheItem{V}(data::V, size::Int) where {V}
     new{V}(
       0,
       0,
+      size,
       data
     )
   end
@@ -22,7 +24,7 @@ function Base.isless(a::CacheItem{V}, b::CacheItem{V}) where {V}
 end
 
 function Base.show(io::IO, cache_item::CacheItem)
-  print(io, "CacheItem(Priority key: $(cache_item.priority_key), frequency: $(cache_item.frequency)")
+  print(io, "CacheItem(Priority key: $(cache_item.priority_key), frequency: $(cache_item.frequency), size: $(cache_item.size))")
 end
 
 function Base.isless(a::CacheHeapNode{K,V}, b::CacheHeapNode{K,V}) where {K,V}
@@ -31,3 +33,4 @@ end
 
 lfu_priority_key_policy(cache_item::CacheItem, ::Float64)::Float64 = cache_item.frequency
 lfuda_priority_key_policy(cache_item::CacheItem, age::Float64)::Float64 = cache_item.frequency + age
+gdsf_priority_key_policy(cache_item::CacheItem, age::Float64)::Float64 = cache_item.frequency / cache_item.size + age

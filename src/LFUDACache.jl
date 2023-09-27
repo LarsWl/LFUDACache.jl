@@ -89,43 +89,43 @@ function Base.get(default::Base.Callable, lfuda::LFUDA, key)
   end
 end
 
-function Base.get!(lfuda::LFUDA{K, V}, key::K, default::V)::V where {K,V}
+function Base.get!(lfuda::LFUDA{K, V}, key::K, default::V; size::Integer=1)::V where {K,V}
   v =
     lock(lfuda.lock) do
       cache_value = _unsafe_retrieve_cache(lfuda, key)
 
       !isnothing(cache_value) && return cache_value
 
-      cache_item = insert_cache_item!(lfuda, key, default)
+      cache_item = insert_cache_item!(lfuda, key, default, size)
 
       cache_item.data
     end
 end
 
-function Base.get!(default::Base.Callable, lfuda::LFUDA{K, V}, key::K)::V where {K,V}
+function Base.get!(default::Base.Callable, lfuda::LFUDA{K, V}, key::K; size::Integer=1)::V where {K,V}
   v =
     lock(lfuda.lock) do
       cache_value = _unsafe_retrieve_cache(lfuda, key)
 
       !isnothing(cache_value) && return cache_value
 
-      cache_item = insert_cache_item!(lfuda, key, default())
+      cache_item = insert_cache_item!(lfuda, key, default(), size)
 
       cache_item.data
     end
 end
 
-function Base.setindex!(lfuda::LFUDA{K, V}, value::V, key::K)::V where {K,V}
+function Base.setindex!(lfuda::LFUDA{K, V}, value::V, key::K; size::Int=1)::V where {K,V}
   lock(lfuda.lock) do
     cache_tuple = get(lfuda.cache, key, nothing)
 
     cache_item =
       if isnothing(cache_tuple)
-        insert_cache_item!(lfuda, key, value)
+        insert_cache_item!(lfuda, key, value, size)
       else
         node_index, = cache_tuple
 
-        replace_cache_item!(lfuda, node_index, key, value)
+        replace_cache_item!(lfuda, node_index, key, value, size)
       end
 
     return cache_item.data
@@ -148,8 +148,8 @@ function Base.delete!(lfuda::LFUDA{K,V}, key::K)::LFUDA{K,V} where {K,V}
   end
 end
 
-function replace_cache_item!(lfuda::LFUDA{K, V}, node_index::Integer, key::K, value::V)::CacheItem{V} where {K,V}
-  cache_item = CacheItem{V}(value)
+function replace_cache_item!(lfuda::LFUDA{K, V}, node_index::Integer, key::K, value::V, size::Integer)::CacheItem{V} where {K,V}
+  cache_item = CacheItem{V}(value, size)
 
   hit_cache_item!(lfuda, node_index, key, cache_item)
 
@@ -167,10 +167,10 @@ function hit_cache_item!(lfuda::LFUDA{K,V}, node_index::Integer, key::K, cache_i
   update!(lfuda.heap, node_index, cache_heap_node)
 end
 
-function insert_cache_item!(lfuda::LFUDA{K, V}, key::K, value::V)::CacheItem{V} where {K, V}
+function insert_cache_item!(lfuda::LFUDA{K, V}, key::K, value::V, size::Integer)::CacheItem{V} where {K, V}
   should_evict(lfuda) && evict!(lfuda)
 
-  cache_item = CacheItem{V}(value)
+  cache_item = CacheItem{V}(value, size)
 
   cache_item.frequency = 1
   cache_item.priority_key = lfuda.priority_key_policy(cache_item, lfuda.age)
