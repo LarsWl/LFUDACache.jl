@@ -1,14 +1,14 @@
 mutable struct CacheItem{V}
   priority_key::Float64
   frequency::Int
-  size::Int
+  size::Integer
   data::V
 
-  function CacheItem{V}(data::V) where {V}
+  function CacheItem{V}(data::V, size::Int) where {V}
     new{V}(
       0,
       0,
-      sizeof(data),
+      size,
       data
     )
   end

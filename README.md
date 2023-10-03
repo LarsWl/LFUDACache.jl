@@ -14,7 +14,10 @@ lfuda = LFUDA{String,String}(maxsize = 2)
 
 lfuda["key"] = "cache_1" 
 cache_1 = get(lfuda, "key", nothing) # Now cache 1 have frequency equal to 2
-cache_2 = get!(lfuda, "key_2", "cache_2") # Cache 2 have frequncy equal to 1
+
+value = "cache_2"
+# Pass value size, necessary for GDSF policy
+cache_2 = get!(lfuda, "key_2", value, size=sizeof(value)) # Cache 2 have frequncy equal to 1
 
 lfuda["key_3"] = "cache_3" # In this case cache_2 will be evicted
 

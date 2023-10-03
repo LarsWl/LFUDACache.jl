@@ -60,7 +60,7 @@ end
 
     init_size = lfuda.current_size
 
-    get!(lfuda, key, value)
+    get!(lfuda, key, value, size=sizeof(Int))
 
     @test haskey(lfuda.cache, key)
     @test lfuda.current_size == init_size + 1
@@ -79,7 +79,7 @@ end
     # Access element to increase its frequency
     lfuda[:key_1]
 
-    lfuda[:key_2] = 2
+    setindex!(lfuda, 2, :key_2, size=sizeof(Int))
 
     lfuda[:key_3] = 3
     lfuda[:key_3]
